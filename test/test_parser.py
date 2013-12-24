@@ -2,7 +2,7 @@ __author__ = 'kmadac'
 
 import unittest
 
-from parser import *
+from dataparser import *
 import datetime
 
 
