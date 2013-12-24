@@ -17,7 +17,8 @@ def parse_line(line):
     result = lineregexp.match(line)
     result_dict = None
     if result:
-        result_dict = {'datetime': datetime.datetime.fromtimestamp(float(result.groups()[0])),
+        result_dict = {'timestamp': result.groups()[0],
+                       'datetime': datetime.datetime.fromtimestamp(float(result.groups()[0])),
                        'deviation': int(result.groups()[1]), 'pressure': int(result.groups()[3])}
 
     return result_dict
