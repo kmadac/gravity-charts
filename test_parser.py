@@ -15,5 +15,9 @@ class TestParser(unittest.TestCase):
 
         self.assertEqual(expected, result)
 
+        line = ''
+        result = parse_line(line)
+        self.assertIsNone(result)
+
 if __name__ == '__main__':
     unittest.main()
