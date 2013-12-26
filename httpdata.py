@@ -14,9 +14,7 @@ hour = re.compile("log_(\d\d)h00m.gz$")
 def _download_file(url, local_path='.'):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
-    print url
     r = requests.get(url, stream=True)
-    print os.path.join(local_path, local_filename)
     with open(os.path.join(local_path, local_filename), 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
             if chunk: # filter out keep-alive new chunks
@@ -81,6 +79,7 @@ def get_data(url, year, day, hour, destination_dir):
             if parsed_line:
                 measured_data.append(parsed_line)
 
+    os.unlink(os.path.join(destination_dir, file_name))
     return measured_data
 
 

@@ -4,7 +4,6 @@ import unittest
 import httpdata
 
 
-
 class HttpDataCase(unittest.TestCase):
     def test_getyears(self):
         years = httpdata.get_years('http://192.168.123.179/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c-0_0x60')
