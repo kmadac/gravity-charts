@@ -10,7 +10,7 @@ def get_last_timestamp(r_server):
 def set_last_record(r_server, year, day, hour):
     """
     Stores to db which data were synced last time.
-    It has to be executed at the end of the sync script
+    It has to be executed at the end of the sync loop in sync script
     """
     r_server.set('last_record', '{0} {1} {2}'.format(year, day, hour))
 
@@ -18,7 +18,8 @@ def set_last_record(r_server, year, day, hour):
 def get_last_record(r_server):
     last_record = r_server.get('last_record')
     if last_record:
-        return r_server.get(last_record).split()
+        last_record = [int(i) for i in last_record.split()]
+        return last_record
     else:
         return None
 
