@@ -17,5 +17,9 @@ class HttpDataCase(unittest.TestCase):
         hours = httpdata.get_hours('http://192.168.123.179/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c-0_0x60', 2013, 219)
         self.assertEqual(hours[0], 12)
 
+    def test_getfiles(self):
+        files = httpdata.get_files('http://192.168.123.179/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c-0_0x60', 2013, 219)
+        self.assertEqual(files[0], 'log_11h57m.gz')
+
 if __name__ == '__main__':
     unittest.main()

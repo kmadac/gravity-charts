@@ -9,7 +9,7 @@ import dataparser
 year = re.compile("^2\d\d\d$")
 day = re.compile("[0|1|2|3]\d\d$")
 hour = re.compile("log_(\d\d)h00m.gz$")
-
+files = re.compile("log_\d\dh\d\dm.gz$")
 
 def _download_file(url, local_path='.'):
     local_filename = url.split('/')[-1]
@@ -53,7 +53,7 @@ def get_days(url, year):
 
 def get_hours(url, year, day):
     """
-    Return list of hour data files found on page
+    Return list of hour data files found on page as hours
     """
     r = requests.get(url + "/" + str(year) + "/" + str(day))
     if r.status_code == 200:
@@ -61,6 +61,20 @@ def get_hours(url, year, day):
         links = parsed.findAll('a')
         list_hours = [int(hour.match(link.text).groups()[0]) for link in links if hour.match(link.text)]
         return sorted(list_hours)
+    else:
+        r.raise_for_status()
+
+
+def get_files(url, year, day):
+    """
+    Return list of hour data files found on page
+    """
+    r = requests.get(url + "/" + str(year) + "/" + str(day))
+    if r.status_code == 200:
+        parsed = BeautifulSoup(r.text)
+        links = parsed.findAll('a')
+        list_files = [link.text for link in links if files.match(link.text)]
+        return sorted(list_files)
     else:
         r.raise_for_status()
 
