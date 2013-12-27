@@ -1,7 +1,7 @@
 __author__ = 'kmadac'
 import re
 
-lineregexp = re.compile("^(\d{10}.\d{9})\s+(-?\d+)\s+\d+\s+\d+\s+\d+\s+(\d+)\s+(\d+)$")
+measure_regexp = re.compile("^(\d{10}.\d{9})\s+(-?\d+)\s+\d+\s+\d+\s+\d+\s+(\d+)\s+(\d+)$")
 
 
 def parse_line(line):
@@ -13,7 +13,7 @@ def parse_line(line):
     {'timestamp': unixtimestamp.miliseconds, 'deviation': integer, 'pressure': integer }
     Return None if format of line is not parsable
     """
-    result = lineregexp.match(line)
+    result = measure_regexp.match(line)
     result_dict = None
     if result:
         result_dict = {'timestamp': result.groups()[0],
