@@ -11,6 +11,7 @@ day = re.compile("[0|1|2|3]\d\d$")
 hour = re.compile("log_(\d\d)h00m.gz$")
 files = re.compile("log_\d\dh\d\dm.gz$")
 
+
 def _download_file(url, local_path='.'):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
@@ -79,13 +80,13 @@ def get_files(url, year, day):
         r.raise_for_status()
 
 
-def get_data(url, year, day, hour, destination_dir):
+def get_data(url, year, day, filename, destination_dir):
     """
-    Reads file specified by year, day and hour paramaters and returns list of parsed dictionaries
+    Reads file specified by year, day and filename paramaters and returns list of parsed dictionaries
     Look into dataparser.py module for dictionary format
     """
-    path = '{0}/{1}/{2}/log_{3:02d}h00m.gz'.format(url, year, day, hour)
-    file_name = _download_file(path, local_path=destination_dir)
+    http_path = '{0}/{1}/{2}/{3}'.format(url, year, day, filename)
+    file_name = _download_file(http_path, local_path=destination_dir)
     measured_data = []
     with open(os.path.join(destination_dir, file_name)) as f:
         for line in f.xreadlines():
