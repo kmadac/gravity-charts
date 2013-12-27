@@ -5,10 +5,11 @@ from BeautifulSoup import BeautifulSoup
 import re
 import os
 import dataparser
+import datetime
+
 
 year = re.compile("^2\d\d\d$")
 day = re.compile("[0|1|2|3]\d\d$")
-hour = re.compile("log_(\d\d)h00m.gz$")
 files = re.compile("log_\d\dh\d\dm.gz$")
 
 
@@ -52,20 +53,6 @@ def get_days(url, year):
         r.raise_for_status()
 
 
-def get_hours(url, year, day):
-    """
-    Return list of hour data files found on page as hours
-    """
-    r = requests.get(url + "/" + str(year) + "/" + str(day))
-    if r.status_code == 200:
-        parsed = BeautifulSoup(r.text)
-        links = parsed.findAll('a')
-        list_hours = [int(hour.match(link.text).groups()[0]) for link in links if hour.match(link.text)]
-        return sorted(list_hours)
-    else:
-        r.raise_for_status()
-
-
 def get_files(url, year, day):
     """
     Return list of hour data files found on page
@@ -97,4 +84,32 @@ def get_data(url, year, day, filename, destination_dir):
     os.unlink(os.path.join(destination_dir, file_name))
     return measured_data
 
+
+def next_day(year, day):
+    last_day = datetime.datetime.strptime("{0} {1}".format(year, day), "%Y %j")
+    day_later = last_day + datetime.timedelta(days=1)
+    day_later = day_later.strftime("%Y %j").split()
+    day_later = [int(i) for i in day_later]
+    return day_later
+
+
+def next_file(url, year, day, filename, filelist):
+    """
+    Returns year, day and filename of next measurement data.
+    Function parameters are values of current measurement data.
+    """
+    try:
+        filename_index = filelist.index(filename)
+    except ValueError:
+        return year, day, None, filelist
+
+    if len(filelist) - 1 == filename_index:
+        year, day = next_day(year, day)
+        filelist = get_files(url, year, day)
+        if filelist:
+            return year, day, filelist[0], filelist
+        else:
+            return year, day, None, filelist
+    else:
+        return year, day, filelist[filename_index + 1], filelist
 
