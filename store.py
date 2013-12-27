@@ -32,13 +32,11 @@ def add_measurements(r_server, data):
     if isinstance(data, list):
         for m_record in data:
             logging.debug(m_record)
-            r_server.rpush(m_record['timestamp'], m_record['deviation'])
-            r_server.rpush(m_record['timestamp'], m_record['pressure'])
+            r_server.set(m_record['timestamp'], '{0} {1}'.format(m_record['deviation'], m_record['pressure']))
 
             r_server.set('last_timestamp', m_record['timestamp'])
     else:
         logging.debug(data)
-        r_server.rpush(data['timestamp'], data['deviation'])
-        r_server.rpush(data['timestamp'], data['pressure'])
+        r_server.set(data['timestamp'], '{0} {1}'.format(data['deviation'], data['pressure']))
         r_server.set('last_timestamp', data['timestamp'])
     return True
