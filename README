@@ -1,4 +1,9 @@
 Gravity charts project
 ======================
 
-#TODO: documentation
+Format of coucbase document:
+
+key: sensor_number-timestamp_in_seconds
+document: {1st number of 1st subsecond part: "deviation pressure",
+           1st number of 2nd subsecond part: "deviation pressure",
+           ...}

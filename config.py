@@ -8,4 +8,4 @@ HTTP_SENSORS = ['http://kyvadlo.fei.tuke.sk/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c
                 'http://kyvadlo.fei.tuke.sk/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c-0_0x61']
 
 
-REDIS_SERVER = 'redis-server'
+DB_SERVER = 'gravity.cb'

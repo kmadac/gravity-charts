@@ -2,41 +2,48 @@ __author__ = 'kmadac'
 
 import logging
 
-
-def get_last_timestamp(r_server):
-    return r_server.get('last_timestamp')
+logger = logging.getLogger('__name__')
 
 
-def set_last_record(r_server, year, day, filename):
+def set_last_record(bucket, sensor_id, year, day, filename):
     """
     Stores to db which data were synced last time.
     It has to be executed at the end of the sync loop in sync script
     """
-    r_server.set('last_record', '{0} {1} {2}'.format(year, day, filename))
+    bucket.set('{0}-last_record'.format(sensor_id), '{0} {1} {2}'.format(year, day, filename))
 
 
-def get_last_record(r_server):
-    last_record = r_server.get('last_record')
-    if last_record:
-        last_record = last_record.split()
+def get_last_record(bucket, sensor_id):
+    last_record = bucket.get('{0}-last_record'.format(sensor_id))
+    if last_record.value:
+        last_record = last_record.value.split()
         return last_record
     else:
         return None
 
 
-def add_measurements(r_server, data):
+def add_measurements(bucket, data, sensor_id):
     """
-    Adds measurement data to DB
-    Data are dictionary or list of dictionaries in format you can find in dataparser.py module
+    Adds measurement data to DB.
+    Data is list of dictionaries in format you can find in dataparser.py module
     """
     if isinstance(data, list):
+        old_ts_sec = None
+        document = {}
         for m_record in data:
-            logging.debug(m_record)
-            r_server.set(m_record['timestamp'], '{0} {1}'.format(m_record['deviation'], m_record['pressure']))
+            sec_part, ms_part = m_record['timestamp'].split(".")
+            key_measurement = '{0}-{1}'.format(sensor_id, sec_part)
+            if old_ts_sec == sec_part:
+                # if we are in same second
+                # document[ms_part] = '{0} {1}'.format(m_record['deviation'], m_record['pressure'])
+                document[int(ms_part[0])] = [m_record['deviation'], m_record['pressure']]
+            else:
+                # if we are in new second
+                if document:
+                    bucket.set(key_measurement, document)
+                # document = {ms_part: '{0} {1}'.format(m_record['deviation'], m_record['pressure'])}
+                document = {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}
+                old_ts_sec = sec_part
 
-            r_server.set('last_timestamp', m_record['timestamp'])
-    else:
-        logging.debug(data)
-        r_server.set(data['timestamp'], '{0} {1}'.format(data['deviation'], data['pressure']))
-        r_server.set('last_timestamp', data['timestamp'])
+            logger.debug(m_record)
     return True

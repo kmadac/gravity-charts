@@ -4,7 +4,7 @@ import logging
 
 import config
 import sys
-import redis
+from couchbase import Couchbase
 
 import httpdata
 import store
@@ -15,10 +15,10 @@ def main():
     # logger.addHandler(logging.StreamHandler())
     logger.setLevel(logging.DEBUG)
 
-    for idx, sensor in enumerate(config.HTTP_SENSORS):
-        r_server = redis.Redis(config.REDIS_SERVER, db=idx)
+    cbclient = Couchbase.connect(host=config.DB_SERVER, bucket="default", quiet=True)
 
-        last_record = store.get_last_record(r_server)
+    for idx, sensor in enumerate(config.HTTP_SENSORS):
+        last_record = store.get_last_record(cbclient, idx)
         logger.info(last_record)
 
         if not last_record:
@@ -39,8 +39,8 @@ def main():
                 break
             logger.debug('Data first:{0} Data last:{1}'.format(data[0], data[-1]))
 
-            store.add_measurements(r_server, data)
-            store.set_last_record(r_server, year, day, filename)
+            store.add_measurements(cbclient, data, idx)
+            store.set_last_record(cbclient, idx, year, day, filename)
 
             year, day, filename, files = httpdata.next_file(sensor, year, day, filename, files)
 
