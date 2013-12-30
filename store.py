@@ -2,7 +2,8 @@ __author__ = 'kmadac'
 
 import logging
 
-logger = logging.getLogger('__name__')
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 def set_last_record(bucket, sensor_id, year, day, filename):
@@ -35,13 +36,12 @@ def add_measurements(bucket, data, sensor_id):
             key_measurement = '{0}-{1}'.format(sensor_id, sec_part)
             if old_ts_sec == sec_part:
                 # if we are in same second
-                # document[ms_part] = '{0} {1}'.format(m_record['deviation'], m_record['pressure'])
                 document[int(ms_part[0])] = [m_record['deviation'], m_record['pressure']]
             else:
                 # if we are in new second
                 if document:
+                    logger.debug("CB Set {0}".format(key_measurement))
                     bucket.set(key_measurement, document)
-                # document = {ms_part: '{0} {1}'.format(m_record['deviation'], m_record['pressure'])}
                 document = {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}
                 old_ts_sec = sec_part
 

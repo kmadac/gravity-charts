@@ -9,12 +9,13 @@ from couchbase import Couchbase
 import httpdata
 import store
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+lhand = logging.StreamHandler()
+logger.addHandler(lhand)
+
 
 def main():
-    logger = logging.getLogger('sync')
-    # logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.DEBUG)
-
     cbclient = Couchbase.connect(host=config.DB_SERVER, bucket="default", quiet=True)
 
     for idx, sensor in enumerate(config.HTTP_SENSORS):
