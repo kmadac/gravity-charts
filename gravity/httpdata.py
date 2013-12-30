@@ -1,10 +1,11 @@
+from gravity import dataparser
+
 __author__ = 'kmadac'
 
 import requests
 from BeautifulSoup import BeautifulSoup
 import re
 import os
-import dataparser
 import datetime
 
 

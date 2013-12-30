@@ -1,13 +1,11 @@
 __author__ = 'kmadac'
 
-import logging
+from gravity import store, httpdata
 
+import logging
 import config
 import sys
 from couchbase import Couchbase
-
-import httpdata
-import store
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

@@ -1,7 +1,8 @@
 __author__ = 'kmadac'
 
+from gravity import chartdata
+
 import config
-import chartdata
 import datetime
 from sys import exit
 from couchbase import Couchbase

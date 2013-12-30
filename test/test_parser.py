@@ -1,9 +1,9 @@
 __author__ = 'kmadac'
 
 import unittest
-
-from dataparser import *
 import datetime
+
+from gravity.dataparser import *
 
 
 class TestParser(unittest.TestCase):

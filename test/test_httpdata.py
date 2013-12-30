@@ -1,7 +1,8 @@
+from gravity import httpdata
+
 __author__ = 'kmadac'
 
 import unittest
-import httpdata
 import config
 
 
