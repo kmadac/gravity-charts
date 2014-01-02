@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gravity Charts</title>
+    <script src="http://www.google.com/jsapi"></script>
+    <script src="static/chartkick.js"></script>
+    <!--
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+    -->
+</head>
+<body>
+<p>Last update {{ last_update }}</p>
+{% line_chart data with library = {'pointSize': 0} %}
+</body>
+</html>

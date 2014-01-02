@@ -1,9 +1,10 @@
 __author__ = 'kmadac'
 
 import logging
+from couchbase import exceptions
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+# logger.addHandler(logging.NullHandler())
 
 
 def set_last_record(bucket, sensor_id, year, day, filename):
@@ -41,7 +42,12 @@ def add_measurements(bucket, data, sensor_id):
                 # if we are in new second
                 if document:
                     logger.debug("CB Set {0}".format(key_measurement))
-                    bucket.set(key_measurement, document)
+                    try:
+                        bucket.set(key_measurement, document)
+                    except exceptions.TemporaryFailError as e:
+                        print("error key_measurement")
+                        raise e
+
                 document = {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}
                 old_ts_sec = sec_part
 

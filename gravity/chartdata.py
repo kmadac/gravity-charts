@@ -1,6 +1,7 @@
 __author__ = 'kmadac'
 
 import time
+import datetime
 import logging
 import collections
 
@@ -35,21 +36,25 @@ def _avg_val(data):
 
 
 def get(bucket, sensor, starttime, endtime, granularity=granularity.seconds):
+    """
+    Returns data for chartkick.py - tuple of unordered dictionaries in following format:
+    {timestamp: value, timestamp: value, ...}
+    Firt dictionary is deviation data and second is pressure data
+    """
     pressure = {}
     deviation = {}
 
     start_ts = int(time.mktime(starttime.timetuple()))
     end_ts = int(time.mktime(endtime.timetuple()))
 
-    keys = ['{0}-{1}'.format(sensor, ts) for ts in xrange(start_ts, end_ts, granularity)]
+    keys = ['{0}-{1}'.format(sensor, ts) for ts in xrange(start_ts, end_ts + granularity, granularity)]
     datas = bucket.get_multi(keys)
 
     for key, measure in datas.iteritems():
         if measure.value:
-            deviation[int(key[2:])] = _avg_val(measure.value)[0]
-            pressure[int(key[2:])] = _avg_val(measure.value)[1]
+            keyname = datetime.datetime.fromtimestamp(float(key[2:])).strftime("%Y-%m-%d %H:%M:%S")
+            deviation[keyname] = _avg_val(measure.value)[0]
+            pressure[keyname] = _avg_val(measure.value)[1]
 
-    deviation_ordered = collections.OrderedDict(sorted(deviation.items(), key=lambda t: t[0]))
-    pressure_ordered = collections.OrderedDict(sorted(pressure.items(), key=lambda t: t[0]))
 
-    return deviation_ordered, pressure_ordered
+    return deviation, pressure
