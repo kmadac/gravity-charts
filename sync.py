@@ -7,7 +7,7 @@ import config
 import sys
 from couchbase import Couchbase, exceptions
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 lhand = logging.StreamHandler()
 logger.addHandler(lhand)

@@ -4,7 +4,7 @@ import logging
 from couchbase import exceptions
 
 logger = logging.getLogger(__name__)
-# logger.addHandler(logging.NullHandler())
+logger.addHandler(logging.NullHandler())
 
 
 def set_last_record(bucket, sensor_id, year, day, filename):
@@ -18,6 +18,7 @@ def set_last_record(bucket, sensor_id, year, day, filename):
 def get_last_record(bucket, sensor_id):
     last_record = bucket.get('{0}-last_record'.format(sensor_id))
     if last_record.value:
+        logger.debug("Last record: {0}".format(last_record.value))
         last_record = last_record.value.split()
         return last_record
     else:
@@ -51,7 +52,6 @@ def add_measurements(bucket, data, sensor_id):
             sec_part = int(sec_ts) - _get_prev_minute_timestamp(int(sec_ts))
             ts_min = _get_prev_minute_timestamp(int(sec_ts))
 
-
             if old_ts_min == ts_min:
                 if sec_part not in document:
                     document[sec_part] = {}
@@ -68,37 +68,6 @@ def add_measurements(bucket, data, sensor_id):
 
                 document = {sec_part: {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}}
                 old_ts_min = _get_prev_minute_timestamp(int(sec_ts))
-
-            logger.debug(m_record)
-    return True
-
-
-def add_measurements_old(bucket, data, sensor_id):
-    """
-    Adds measurement data to DB.
-    Data is list of dictionaries in format you can find in dataparser.py module
-    """
-    if isinstance(data, list):
-        old_ts_sec = None
-        document = {}
-        for m_record in data:
-            sec_part, ms_part = m_record['timestamp'].split(".")
-            key_measurement = '{0}-{1}'.format(sensor_id, sec_part)
-            if old_ts_sec == sec_part:
-                # if we are in same second
-                document[int(ms_part[0])] = [m_record['deviation'], m_record['pressure']]
-            else:
-                # if we are in new second
-                if document:
-                    logger.debug("CB Set {0}".format(key_measurement))
-                    try:
-                        bucket.set(key_measurement, document)
-                    except exceptions.TemporaryFailError as e:
-                        logger.debug("{0}".format(e.message))
-                        raise e
-
-                document = {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}
-                old_ts_sec = sec_part
 
             logger.debug(m_record)
     return True
