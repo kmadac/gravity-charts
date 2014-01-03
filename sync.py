@@ -34,7 +34,7 @@ def main():
 
         if year and day and filename and files:
             while True:
-                logger.debug('Sensor:{0} Year:{1} Day:{0} filename:{1}'.format(idx, year, day, filename))
+                logger.debug('Sensor:{0} Year:{1} Day:{2} filename:{3}'.format(idx, year, day, filename))
                 data = httpdata.get_data(sensor, year, day, filename, '/media/kmadac/EXT_HDD_80GB')
                 # if not data:
                 #     logger.info("No data parsed in {0}/{1}/{2}/{3}".format(sensor, year, day, filename))
