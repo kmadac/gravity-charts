@@ -20,8 +20,8 @@ app.jinja_env.add_extension("chartkick.ext.charts")
 
 @app.route('/')
 def index():
-    starttime = datetime.datetime(year=2013, month=8, day=2, hour=1)
-    endtime = datetime.datetime(year=2013, month=9, day=16, hour=23)
+    starttime = datetime.datetime(year=2013, month=8, day=7, hour=1)
+    endtime = datetime.datetime(year=2013, month=8, day=9, hour=23)
 
     last_update_raw = store.get_last_record(db, 0)
     last_update_datetime = datetime.datetime.strptime("{0} {1}".format(last_update_raw[0], last_update_raw[1]),

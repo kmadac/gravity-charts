@@ -11,7 +11,7 @@ import time
 
 def main():
     starttime = datetime.datetime(year=2013, month=8, day=7, hour=11)
-    endtime = datetime.datetime(year=2013, month=8, day=10, hour=11)
+    endtime = datetime.datetime(year=2013, month=8, day=9, hour=11)
 
     cbclient = Couchbase.connect(host=config.DB_SERVER, bucket="default", quiet=True)
 

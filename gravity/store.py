@@ -1,5 +1,6 @@
 __author__ = 'kmadac'
 
+from util import get_prev_minute_timestamp
 import logging
 from couchbase import exceptions
 
@@ -25,32 +26,24 @@ def get_last_record(bucket, sensor_id):
         return None
 
 
-def _get_prev_minute_timestamp(timestamp_sec):
-    """
-    Returns timestamp of minute to which timestamp_sec parameter belongs.
-    It means that if timestamp_sec argument is 1407838210 (10h10m10s), function returns 1407838200(10h10m0s)
-    """
-    return timestamp_sec / 60 * 60
-
-
 def add_measurements(bucket, data, sensor_id):
     """
     Adds measurement data to DB.
     Data is list of dictionaries in format you can find in dataparser.py module
     """
     if isinstance(data, list):
-        minute_ts = _get_prev_minute_timestamp(int(data[0]['timestamp'].split(".")[0]))
-        minute_db = bucket.get(str(minute_ts))
+        # minute_ts = _get_prev_minute_timestamp(int(data[0]['timestamp'].split(".")[0]))
+        # minute_db = bucket.get(str(minute_ts))
         # if minute_db.value:
 
         sec_ts, ms_part = data[0]['timestamp'].split(".")
-        old_ts_min = _get_prev_minute_timestamp(int(sec_ts))
+        old_ts_min = get_prev_minute_timestamp(int(sec_ts))
 
         document = {}
         for m_record in data:
             sec_ts, ms_part = m_record['timestamp'].split(".")
-            sec_part = int(sec_ts) - _get_prev_minute_timestamp(int(sec_ts))
-            ts_min = _get_prev_minute_timestamp(int(sec_ts))
+            sec_part = int(sec_ts) - get_prev_minute_timestamp(int(sec_ts))
+            ts_min = get_prev_minute_timestamp(int(sec_ts))
 
             if old_ts_min == ts_min:
                 if sec_part not in document:
@@ -67,7 +60,7 @@ def add_measurements(bucket, data, sensor_id):
                         raise e
 
                 document = {sec_part: {int(ms_part[0]): [m_record['deviation'], m_record['pressure']]}}
-                old_ts_min = _get_prev_minute_timestamp(int(sec_ts))
+                old_ts_min = get_prev_minute_timestamp(int(sec_ts))
 
             logger.debug(m_record)
     return True

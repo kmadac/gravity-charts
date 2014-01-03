@@ -3,7 +3,7 @@ __author__ = 'kmadac'
 import time
 import datetime
 import logging
-import collections
+from util import get_prev_minute_timestamp
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -47,14 +47,31 @@ def get(bucket, sensor, starttime, endtime, granularity=granularity.seconds):
     start_ts = int(time.mktime(starttime.timetuple()))
     end_ts = int(time.mktime(endtime.timetuple()))
 
-    keys = ['{0}-{1}'.format(sensor, ts) for ts in xrange(start_ts, end_ts + granularity, granularity)]
+    timestamps = [ts for ts in xrange(start_ts, end_ts + granularity, granularity)]
+
+    minutes_ts = []
+    for ts in timestamps:
+        minute = get_prev_minute_timestamp(ts)
+        if minute not in minutes_ts:
+            minutes_ts.append(minute)
+
+    keys = ['{0}-{1}'.format(sensor, ts) for ts in minutes_ts]
+
     datas = bucket.get_multi(keys)
 
-    for key, measure in datas.iteritems():
-        if measure.value:
-            keyname = datetime.datetime.fromtimestamp(float(key[2:])).strftime("%Y-%m-%d %H:%M:%S")
-            deviation[keyname] = _avg_val(measure.value)[0]
-            pressure[keyname] = _avg_val(measure.value)[1]
-
+    for ts in timestamps:
+        minute = get_prev_minute_timestamp(ts)
+        seconds = ts - minute
+        val = datas.get('{0}-{1}'.format(sensor, minute)).value
+        if val:
+            keyname = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+            try:
+                deviation[keyname] = _avg_val(val[str(seconds)])[0]
+            except KeyError:
+                pass
+            try:
+                pressure[keyname] = _avg_val(val[str(seconds)])[1]
+            except KeyError:
+                pass
 
     return deviation, pressure
