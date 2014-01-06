@@ -9,4 +9,4 @@ HTTP_SENSORS = ['http://kyvadlo.fei.tuke.sk/kyvadlo/DATA/kyvadlo/LOG/kyvadlo_i2c
 
 
 DB_SERVER = 'gravity.cb'
-NUMBER_OF_POINTS = 100
+NUMBER_OF_POINTS = 150

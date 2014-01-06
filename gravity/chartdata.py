@@ -2,6 +2,7 @@ __author__ = 'kmadac'
 
 import time
 import datetime
+import pytz
 import logging
 from util import get_prev_minute_timestamp
 
@@ -44,6 +45,8 @@ def get(bucket, sensor, starttime, endtime, granularity=granularity.seconds):
     pressure = {}
     deviation = {}
 
+    utc = pytz.timezone("UTC")
+
     start_ts = int(time.mktime(starttime.timetuple()))
     end_ts = int(time.mktime(endtime.timetuple()))
 
@@ -64,7 +67,7 @@ def get(bucket, sensor, starttime, endtime, granularity=granularity.seconds):
         seconds = ts - minute
         val = datas.get('{0}-{1}'.format(sensor, minute)).value
         if val:
-            keyname = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+            keyname = datetime.datetime.fromtimestamp(ts, tz=utc).strftime("%Y-%m-%d %H:%M:%S")
             try:
                 deviation[keyname] = _avg_val(val[str(seconds)])[0]
             except KeyError:
